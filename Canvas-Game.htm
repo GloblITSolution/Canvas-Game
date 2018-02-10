@@ -1,0 +1,198 @@
+<html>
+<head>
+	<title>Canvas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+
+<body>
+	<canvas style="background-color:black;" id="draw" height="300" width="230">
+	Hey Update your browser use latest chrome
+	</canvas>
+
+	<script>
+		//Var
+		var can= document.getElementById("draw");
+		var c= can.getContext("2d");
+		var p1x = 5;
+		var p1y= 20;
+		var p2x=can.width-15;
+		var ballX=30;
+		var ballY=30;
+		var lastX;
+		var lastY;
+		var p2y=40;
+		var start=false;
+		var hitp2=false;
+		var hitp1=false;
+		var hitUpWall=false;
+		var hitDownWall=false;
+		var speed=1.5;
+		var play=1;
+		var youScore=0;
+		var compScore=0;
+		var time=10000;
+		//color for Player and ball
+		c.fillStyle="white";
+		
+		window.onload = function(){
+			addEventListener('mousemove', function (e){
+				p1y=e.clientY
+			});
+			addEventListener('keyup', function (e){
+			if(e.keyCode==38){p1y-=15;}
+			if(e.keyCode==40){p1y+=15;}
+			});
+			inter = setInterval(update, 20);
+			interComp = setInterval(updateComp, 700);//comp update Time
+		}
+		// Comp player update function
+		function updateComp(){
+					if(ballY<p2y+50){p2y-=23+((speed+1)*5)}
+					if(ballY>p2y+50){p2y+=23+((speed+1)*5)}
+		}
+		
+		function update(){
+			speed +=0.001;
+			time -=1;
+			//hit Comp 
+			if(time<0){alert('Time Over OK to restart');window.location.reload();}
+			if(ballX>=p2x){
+			
+				start=true;
+				if(ballY>=p2y && ballY <=p2y+100){
+				hitp2=true;
+				hitp1=false;
+				hitDownWall=false;
+				hitUpWall=false;
+				}
+			}
+			
+			//Hit our player
+			if(ballX<=p1x+2){
+				start=true;
+				if(ballY>=p1y && ballY <=p1y+100){
+				
+				hitp2=false;
+				hitp1=true;
+				hitDownWall=false;
+				hitUpWall=false;
+				}
+			}
+			//hitDownWall
+			if(ballY>=can.height-2){
+				if(ballX>=10 && ballX<=can.width-10){
+				start=true;
+				hitp2=false;
+				hitp1=false;
+				hitUpWall=false;
+				hitDownWall=true;
+				}
+			}
+			//hitUpWall
+			if(ballY<=2){
+				if(ballX>=10 && ballX <can.width-10){
+				start=true;
+				hitp2=false;
+				hitp1=false;
+				hitUpWall=true;
+				hitDownWall=false;
+				}
+			}
+			//Win
+			if(ballX<=2){
+			compScore+=1;
+			alert('lose');
+			speed=1.5;
+			ballX=0;ballY=200;lastX=1;
+			start=false;
+			}
+			if(ballX>=can.width-2){
+			youScore+=1;
+			alert('Win'); 
+			speed=1.5;
+			ballX=0;ballY=200;lastX=0; 	
+			start=false;
+			}
+			
+		//action
+			//start
+			if(start==false){ballX+=speed;lastX=1;	ballY+=0.5;lastY=1;}else
+			
+			// hit comp
+			if(hitp2==true){
+				
+				if(ballY<p2y+30 ){
+				ballX-=speed;lastX=0;	ballY-=1.5;lastY=0;
+				}else
+				
+				if(ballY>p2y+30 && ballY<p2y+70){
+				ballX-=speed;lastX=0;
+				}else
+				
+				if(ballY>=p2y+70 ){
+				ballX-=speed;lastX=0;	ballY+=1.5;lastY=1;
+				}
+			}
+			//hit our player
+			if(hitp1==true){
+				if(ballY<p1y+30 ){
+				ballX+=speed;lastX=1;	ballY-=1.5;lastY=0;
+				}else
+				
+				if(ballY>p1y+30 && ballY<p1y+70){
+				ballX+=speed;lastX=1;
+				}else
+				
+				if(ballY>=p1y+70 ){
+				ballX+=speed;lastX=1;	ballY+=1.5;lastY=1;
+				}
+			}
+			//hitDownWall
+			if(hitDownWall==true){
+				if(lastX==1){
+				ballX+=speed;lastX=1;	ballY-=0.5;lastY=0;
+				}else
+
+				if(lastX==0){
+				ballX-=speed;lastX=0;	ballY-=0.5;lastY=0;
+				}
+			}
+			//hitUpWall
+			if(hitUpWall==true){
+				if(lastX==1){
+				ballX+=speed;lastX=1;	ballY+=0.5;lastY=1;
+				}else
+
+				if(lastX==0){
+				ballX-=speed;lastX=0;	ballY+=0.5;lastY=1;
+				}
+			}
+			c.clearRect(0, 0, can.width, can.height);
+			c.fillStyle="white";
+			c.fillRect(p1x, p1y, 10, 100);//P1
+			c.fillStyle="#8b8f96";//p1 middle color
+			c.fillRect(p1x, p1y+30, 10, 40);//p1 middle
+			c.fillStyle="white";
+			c.fillRect(p2x, p2y, 10, 100);//Comp P2
+			c.fillStyle="#8b8f96";//p2 middle color
+			c.fillRect(p2x, p2y+30, 10, 40);//p2 middle
+			c.fillStyle="white";
+			c.fillRect(ballX, ballY, 5,5);//ball
+			c.fillStyle="yellow";
+			c.font = "12px Arial";
+			c.fillText('You='+youScore,10,can.height-25);
+			c.fillText('Comp='+compScore,can.width-50,can.height-25);
+			c.fillText('Time Left:-'+time, can.width-((can.width/2)+50), can.height-25);
+
+		}
+
+	</script>
+<br>
+
+<button onclick="if(play==1){play=0;clearInterval(inter);this.innerHTML='Play'}else if(play==0){play=1;inter = setInterval(update, 20);this.innerHTML='Pause'}">Pause</button>
+<button onclick="window.location.reload()">Restart</button>
+<a href="https://www.youtube.com/watch?v=rqEJ7WiLWdo">Learn</a>
+
+</body>
+</html>
